@@ -1,0 +1,53 @@
+{
+  "name": "lightning-toll",
+  "version": "0.1.0",
+  "description": "Drop-in Express middleware for Lightning-gated API endpoints. L402 protocol, macaroons, auto-pay client — monetize any API with Bitcoin Lightning.",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./client": "./src/client/index.js"
+  },
+  "keywords": [
+    "lightning",
+    "bitcoin",
+    "l402",
+    "api",
+    "paywall",
+    "middleware",
+    "express",
+    "macaroon",
+    "micropayments",
+    "monetization",
+    "toll",
+    "402"
+  ],
+  "author": "Jeletor",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jeletor/lightning-toll.git"
+  },
+  "homepage": "https://github.com/jeletor/lightning-toll#readme",
+  "bugs": {
+    "url": "https://github.com/jeletor/lightning-toll/issues"
+  },
+  "dependencies": {
+    "lightning-agent": "^0.3.0"
+  },
+  "peerDependencies": {
+    "express": "^4.0.0 || ^5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "express": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "files": [
+    "src/",
+    "README.md",
+    "LICENSE"
+  ]
+}

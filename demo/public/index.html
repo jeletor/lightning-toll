@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>⚡ lightning-toll Demo</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --border: #30363d;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --accent: #f7931a;
+      --accent2: #ffd700;
+      --green: #3fb950;
+      --red: #f85149;
+      --blue: #58a6ff;
+      --purple: #bc8cff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    header h1 span { color: var(--accent); }
+
+    header p {
+      color: var(--muted);
+      font-size: 1.1rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      transition: border-color 0.2s;
+    }
+
+    .card:hover { border-color: var(--accent); }
+
+    .card h3 {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+      font-size: 1.1rem;
+    }
+
+    .card .method {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: var(--blue);
+      color: var(--bg);
+    }
+
+    .card .method.post { background: var(--green); }
+
+    .card .price {
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .card .desc {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 0.5rem 1.25rem;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      background: transparent;
+      color: var(--accent);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn:hover {
+      background: var(--accent);
+      color: var(--bg);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .result {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.8rem;
+      white-space: pre-wrap;
+      word-break: break-all;
+      max-height: 300px;
+      overflow-y: auto;
+      display: none;
+    }
+
+    .result.visible { display: block; }
+
+    .result .status-402 { color: var(--accent); }
+    .result .status-200 { color: var(--green); }
+    .result .status-error { color: var(--red); }
+
+    /* Dashboard section */
+    .dashboard {
+      grid-column: 1 / -1;
+    }
+
+    .dashboard h2 {
+      margin-bottom: 1rem;
+      color: var(--accent2);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .stat-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .stat-card .value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .stat-card .label {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 0.25rem;
+    }
+
+    .recent-payments {
+      margin-top: 1rem;
+    }
+
+    .recent-payments h4 {
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .payment-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+
+    .payment-row .amount { color: var(--green); font-weight: 600; }
+    .payment-row .endpoint { color: var(--blue); }
+    .payment-row .time { color: var(--muted); }
+
+    /* Code section */
+    .code-section {
+      grid-column: 1 / -1;
+      margin-top: 1rem;
+    }
+
+    .code-section h2 {
+      margin-bottom: 1rem;
+      color: var(--purple);
+    }
+
+    pre {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      overflow-x: auto;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 0.85rem;
+      line-height: 1.7;
+      margin-bottom: 1rem;
+    }
+
+    pre .comment { color: var(--muted); }
+    pre .keyword { color: var(--purple); }
+    pre .string { color: var(--green); }
+    pre .fn { color: var(--blue); }
+
+    .echo-input {
+      width: 100%;
+      padding: 0.5rem;
+      margin-bottom: 0.75rem;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 0.9rem;
+      font-family: inherit;
+    }
+
+    .echo-input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+
+    footer a { color: var(--accent); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>⚡ <span>lightning-toll</span> Demo</h1>
+      <p>Every endpoint below is gated by Lightning. Hit "Try it" to see the L402 flow in action — 402 response with invoice → payment → access granted.</p>
+    </header>
+
+    <div class="grid">
+      <!-- Joke endpoint -->
+      <div class="card">
+        <h3><span class="method">GET</span> /api/joke</h3>
+        <div class="price">5 sats</div>
+        <div class="desc">Random programming joke. Pay 5 sats, get a laugh.</div>
+        <button class="btn" onclick="tryEndpoint('/api/joke', 'GET', 'joke-result')">Try it ⚡</button>
+        <div class="result" id="joke-result"></div>
+      </div>
+
+      <!-- Time endpoint -->
+      <div class="card">
+        <h3><span class="method">GET</span> /api/time</h3>
+        <div class="price">1 sat</div>
+        <div class="desc">Current server time. The cheapest API call you'll ever make.</div>
+        <button class="btn" onclick="tryEndpoint('/api/time', 'GET', 'time-result')">Try it ⚡</button>
+        <div class="result" id="time-result"></div>
+      </div>
+
+      <!-- Echo endpoint -->
+      <div class="card">
+        <h3><span class="method post">POST</span> /api/echo</h3>
+        <div class="price">1 sat / word</div>
+        <div class="desc">Echo your text back. Dynamic pricing: more words = more sats.</div>
+        <input class="echo-input" id="echo-text" placeholder="Type something to echo..." value="Hello Lightning world!" />
+        <button class="btn" onclick="tryEcho()">Try it ⚡</button>
+        <div class="result" id="echo-result"></div>
+      </div>
+
+      <!-- Fortune endpoint -->
+      <div class="card">
+        <h3><span class="method">GET</span> /api/fortune</h3>
+        <div class="price">10 sats</div>
+        <div class="desc">Fortune cookie message. Bitcoin-themed wisdom.</div>
+        <button class="btn" onclick="tryEndpoint('/api/fortune', 'GET', 'fortune-result')">Try it ⚡</button>
+        <div class="result" id="fortune-result"></div>
+      </div>
+
+      <!-- Free tier endpoint -->
+      <div class="card">
+        <h3><span class="method">GET</span> /api/free-tier</h3>
+        <div class="price">21 sats <span style="color: var(--green); font-size: 0.8rem;">(3 free/hour)</span></div>
+        <div class="desc">Free tier demo. First 3 requests per hour are free, then 21 sats each.</div>
+        <button class="btn" onclick="tryEndpoint('/api/free-tier', 'GET', 'free-result')">Try it ⚡</button>
+        <div class="result" id="free-result"></div>
+      </div>
+
+      <!-- Stats -->
+      <div class="card">
+        <h3><span class="method">GET</span> /api/stats</h3>
+        <div class="price" style="color: var(--green);">Free</div>
+        <div class="desc">Live revenue dashboard. See payments flowing in.</div>
+        <button class="btn" onclick="refreshStats()">Refresh 📊</button>
+        <div class="result" id="stats-result"></div>
+      </div>
+
+      <!-- Dashboard -->
+      <div class="card dashboard">
+        <h2>📊 Live Dashboard</h2>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="value" id="stat-revenue">0</div>
+            <div class="label">Total Revenue (sats)</div>
+          </div>
+          <div class="stat-card">
+            <div class="value" id="stat-requests">0</div>
+            <div class="label">Total Requests</div>
+          </div>
+          <div class="stat-card">
+            <div class="value" id="stat-paid">0</div>
+            <div class="label">Paid Requests</div>
+          </div>
+          <div class="stat-card">
+            <div class="value" id="stat-payers">0</div>
+            <div class="label">Unique Payers</div>
+          </div>
+        </div>
+        <div class="recent-payments">
+          <h4>Recent Payments</h4>
+          <div id="recent-list">
+            <div style="color: var(--muted); font-size: 0.85rem;">No payments yet. Try an endpoint above!</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Code examples -->
+      <div class="card code-section">
+        <h2>💻 Code Examples</h2>
+
+        <h4 style="color: var(--muted); margin-bottom: 0.5rem;">Server — protect your endpoints</h4>
+        <pre><span class="keyword">const</span> { createToll } = <span class="fn">require</span>(<span class="string">'lightning-toll'</span>);
+
+<span class="keyword">const</span> toll = <span class="fn">createToll</span>({
+  wallet: process.env.NWC_URL,
+  secret: <span class="string">'your-hmac-secret'</span>
+});
+
+app.<span class="fn">get</span>(<span class="string">'/api/joke'</span>, <span class="fn">toll</span>({ sats: <span class="string">5</span> }), (req, res) => {
+  res.<span class="fn">json</span>({ joke: <span class="string">'...'</span> });
+});</pre>
+
+        <h4 style="color: var(--muted); margin-bottom: 0.5rem;">Client — auto-pay with tollFetch</h4>
+        <pre><span class="keyword">const</span> { tollFetch } = <span class="fn">require</span>(<span class="string">'lightning-toll/client'</span>);
+
+<span class="keyword">const</span> res = <span class="keyword">await</span> <span class="fn">tollFetch</span>(<span class="string">'https://api.example.com/joke'</span>, {
+  wallet: <span class="string">'nostr+walletconnect://...'</span>,
+  maxSats: <span class="string">50</span>
+});
+<span class="keyword">const</span> data = <span class="keyword">await</span> res.<span class="fn">json</span>(); <span class="comment">// Paid 5 sats automatically</span></pre>
+
+        <h4 style="color: var(--muted); margin-bottom: 0.5rem;">cURL — manual L402 flow</h4>
+        <pre><span class="comment"># Step 1: Get the 402 challenge</span>
+curl -s http://localhost:3402/api/joke | jq .
+
+<span class="comment"># Step 2: Pay the invoice with your Lightning wallet</span>
+<span class="comment"># Step 3: Retry with the macaroon and preimage</span>
+curl -H <span class="string">"Authorization: L402 &lt;macaroon&gt;:&lt;preimage&gt;"</span> \
+  http://localhost:3402/api/joke</pre>
+      </div>
+    </div>
+
+    <footer>
+      <p>
+        <a href="https://github.com/jeletor/lightning-toll">lightning-toll</a> — L402 API monetization with Bitcoin Lightning.
+        Built with <a href="https://github.com/jeletor/lightning-agent">lightning-agent</a>.
+      </p>
+    </footer>
+  </div>
+
+  <script>
+    async function tryEndpoint(path, method, resultId) {
+      const el = document.getElementById(resultId);
+      el.classList.add('visible');
+      el.innerHTML = '<span style="color: var(--muted)">Requesting...</span>';
+
+      try {
+        const res = await fetch(path, { method });
+        const data = await res.json();
+        const statusClass = res.status === 402 ? 'status-402' : res.status === 200 ? 'status-200' : 'status-error';
+
+        let output = `<span class="${statusClass}">HTTP ${res.status}</span>\n\n`;
+        output += JSON.stringify(data, null, 2);
+
+        if (res.status === 402) {
+          const wwwAuth = res.headers.get('WWW-Authenticate');
+          if (wwwAuth) {
+            output = `<span class="${statusClass}">HTTP 402 Payment Required</span>\n\n`;
+            output += `WWW-Authenticate: ${wwwAuth.substring(0, 80)}...\n\n`;
+            output += JSON.stringify(data, null, 2);
+          }
+        }
+
+        el.innerHTML = output;
+      } catch (err) {
+        el.innerHTML = `<span class="status-error">Error: ${err.message}</span>`;
+      }
+
+      // Refresh dashboard
+      setTimeout(refreshDashboard, 500);
+    }
+
+    async function tryEcho() {
+      const text = document.getElementById('echo-text').value || 'Hello!';
+      const el = document.getElementById('echo-result');
+      el.classList.add('visible');
+      el.innerHTML = '<span style="color: var(--muted)">Requesting...</span>';
+
+      try {
+        const res = await fetch('/api/echo', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text })
+        });
+        const data = await res.json();
+        const statusClass = res.status === 402 ? 'status-402' : res.status === 200 ? 'status-200' : 'status-error';
+
+        let output = `<span class="${statusClass}">HTTP ${res.status}</span>\n\n`;
+        output += JSON.stringify(data, null, 2);
+        el.innerHTML = output;
+      } catch (err) {
+        el.innerHTML = `<span class="status-error">Error: ${err.message}</span>`;
+      }
+
+      setTimeout(refreshDashboard, 500);
+    }
+
+    async function refreshStats() {
+      const el = document.getElementById('stats-result');
+      el.classList.add('visible');
+
+      try {
+        const res = await fetch('/api/stats');
+        const data = await res.json();
+        el.innerHTML = `<span class="status-200">HTTP 200</span>\n\n` + JSON.stringify(data, null, 2);
+      } catch (err) {
+        el.innerHTML = `<span class="status-error">Error: ${err.message}</span>`;
+      }
+    }
+
+    async function refreshDashboard() {
+      try {
+        const res = await fetch('/api/stats');
+        const data = await res.json();
+
+        document.getElementById('stat-revenue').textContent = data.totalRevenue.toLocaleString();
+        document.getElementById('stat-requests').textContent = data.totalRequests.toLocaleString();
+        document.getElementById('stat-paid').textContent = data.totalPaid.toLocaleString();
+        document.getElementById('stat-payers').textContent = data.uniquePayers.toLocaleString();
+
+        const recentEl = document.getElementById('recent-list');
+        if (data.recentPayments && data.recentPayments.length > 0) {
+          recentEl.innerHTML = data.recentPayments.map(p => {
+            const time = new Date(p.timestamp).toLocaleTimeString();
+            return `<div class="payment-row">
+              <span class="endpoint">${p.endpoint}</span>
+              <span class="amount">+${p.amountSats} sats</span>
+              <span class="time">${time}</span>
+            </div>`;
+          }).join('');
+        }
+      } catch { /* ignore */ }
+    }
+
+    // Auto-refresh dashboard every 5 seconds
+    setInterval(refreshDashboard, 5000);
+    refreshDashboard();
+  </script>
+</body>
+</html>
