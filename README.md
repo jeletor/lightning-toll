@@ -1,6 +1,10 @@
 # ⚡ lightning-toll
 
-**Drop-in Express middleware that puts any API endpoint behind a Lightning paywall.** Consumers pay per request with Bitcoin Lightning — no API keys to manage, no billing system, no Stripe integration. Just `npm install lightning-toll`, wrap your routes, and start earning sats. Implements the [L402 protocol](https://docs.lightning.engineering/the-lightning-network/l402) with proper macaroon credentials.
+**Pay before accessing this endpoint.**
+
+You can't get the data without paying. lightning-toll is the gate — drop-in Express middleware that puts any API behind a Lightning paywall. No API keys to manage, no billing system, no Stripe. Send a request, get a 402 with an invoice, pay it, retry with the preimage, get your data. Implements the [L402 protocol](https://docs.lightning.engineering/the-lightning-network/l402) with proper macaroon credentials.
+
+Part of the constraint chain: [agent-discovery](https://github.com/jeletor/agent-discovery) (find) → [ai-wot](https://github.com/jeletor/ai-wot) (verify) → [lightning-agent](https://github.com/jeletor/lightning-agent) (pay) → **lightning-toll** (gate).
 
 ## Installation
 

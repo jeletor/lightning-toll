@@ -99,16 +99,26 @@ class TollClient {
 /**
  * Simple one-shot toll fetch.
  *
+ * Supports two calling styles:
+ *   tollFetch(url, { wallet, maxSats, method, body, headers })  — single opts
+ *   tollFetch(url, fetchOpts, { wallet, maxSats })               — separate fetch + pay opts
+ *
  * @param {string} url - URL to fetch
- * @param {object} [opts] - Options
- * @param {string|object} opts.wallet - NWC URL or wallet instance
- * @param {number} [opts.maxSats=50] - Max sats to pay
- * @param {object} [opts.headers] - Additional headers
- * @param {string} [opts.method] - HTTP method
- * @param {*} [opts.body] - Request body
+ * @param {object} [optsOrFetchOpts] - Combined options, or standard fetch options
+ * @param {object} [payOpts] - Pay options (if using 3-arg form)
  * @returns {Promise<Response>}
  */
-async function tollFetch(url, opts = {}) {
+async function tollFetch(url, optsOrFetchOpts = {}, payOpts) {
+  // Support both 2-arg and 3-arg calling styles
+  let opts;
+  if (payOpts && typeof payOpts === 'object') {
+    // 3-arg: tollFetch(url, fetchOpts, payOpts)
+    opts = { ...optsOrFetchOpts, ...payOpts };
+  } else {
+    // 2-arg: tollFetch(url, opts)
+    opts = optsOrFetchOpts;
+  }
+
   if (!opts.wallet) {
     throw new Error('tollFetch: wallet is required');
   }
@@ -125,14 +135,14 @@ async function tollFetch(url, opts = {}) {
   if (opts.body) fetchOpts.body = opts.body;
   if (opts.headers) fetchOpts.headers = opts.headers;
 
-  const payOpts = {
+  const paymentOpts = {
     wallet,
     maxSats: opts.maxSats || 50,
     autoRetry: true,
     headers: opts.headers || {}
   };
 
-  return autoPay(url, fetchOpts, payOpts);
+  return autoPay(url, fetchOpts, paymentOpts);
 }
 
 module.exports = {
