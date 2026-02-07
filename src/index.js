@@ -5,6 +5,7 @@ const { createMiddleware } = require('./middleware');
 const { TollStats } = require('./stats');
 const { createMacaroon, decodeMacaroon, verifyMacaroon, verifyPreimage } = require('./macaroon');
 const { formatChallenge, formatChallengeBody, parseAuthorization } = require('./l402');
+const { createMetricsExporter } = require('./metrics');
 
 /**
  * Create a toll booth instance for gating API endpoints behind Lightning payments.
@@ -80,6 +81,15 @@ function createToll(opts = {}) {
   };
 
   /**
+   * Prometheus metrics middleware — returns stats in Prometheus text format.
+   * @returns {Function} Express handler
+   */
+  toll.metrics = function metrics() {
+    const exporter = createMetricsExporter(stats);
+    return exporter.handler();
+  };
+
+  /**
    * Get the stats object directly.
    */
   toll.stats = stats;
@@ -103,5 +113,6 @@ module.exports = {
   formatChallenge,
   formatChallengeBody,
   parseAuthorization,
-  TollStats
+  TollStats,
+  createMetricsExporter
 };

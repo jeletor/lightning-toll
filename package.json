@@ -1,6 +1,6 @@
 {
   "name": "lightning-toll",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Drop-in Express middleware for Lightning-gated API endpoints. L402 protocol, macaroons, auto-pay client — monetize any API with Bitcoin Lightning.",
   "main": "src/index.js",
   "exports": {

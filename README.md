@@ -201,6 +201,38 @@ const stats = toll.stats.toJSON();
 console.log(`Total revenue: ${stats.totalRevenue} sats`);
 ```
 
+### `toll.metrics()` — Prometheus Metrics
+
+Export stats in Prometheus text format for monitoring:
+
+```js
+app.get('/metrics', toll.metrics());
+```
+
+Returns:
+
+```
+# HELP lightning_toll_revenue_sats_total Total revenue collected in satoshis
+# TYPE lightning_toll_revenue_sats_total counter
+lightning_toll_revenue_sats_total 1250
+
+# HELP lightning_toll_requests_total Total number of requests received
+# TYPE lightning_toll_requests_total counter
+lightning_toll_requests_total 340
+
+lightning_toll_paid_requests_total 125
+lightning_toll_unique_payers 42
+lightning_toll_endpoint_revenue_sats{endpoint="/api/joke"} 500
+lightning_toll_payments_per_minute 3
+lightning_toll_average_payment_sats 10
+```
+
+Scrape this endpoint with Prometheus to track:
+- Revenue over time
+- Request volume
+- Payment conversion rates
+- Per-endpoint performance
+
 ## Client SDK
 
 ### `TollClient`
